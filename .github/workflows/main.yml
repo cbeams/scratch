@@ -1,15 +1,16 @@
-workflow "issues" {
-  on       = "issues"
-  resolves = ["Add an issue to project"]
-}
+name: Auto Assign Project
 
-action "Add an issue to project" {
-  uses    = "docker://masutaka/github-actions-all-in-one-project:1.1.0"
-  secrets = ["GITHUB_TOKEN"]
-  args    = ["issue"]
+on: [pull_request, issues]
+env:
+  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-  env = {
-    PROJECT_URL         = "https://github.com/masutaka/sandbox-github-actions/projects/2"
-    INITIAL_COLUMN_NAME = "To do"
-  }
-}
+jobs:
+  assign_one_project:
+    runs-on: ubuntu-latest
+    name: Assign to One Project
+    steps:
+    - name: Run assignment to one project
+      uses: srggrs/assign-one-project-github-action@1.1.0
+      if: github.event.action == 'opened' # not required but speed up the action
+      with:
+        project: 'https://github.com/cbeams/scratch/projects/1'
